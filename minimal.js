@@ -1,5 +1,5 @@
 const Sentry = require("@sentry/node");
-const { Express: ExpressIntegration } = require("@sentry/integrations");
+const { Integrations } = require("@sentry/apm");
 const express = require("express");
 const http = require("http");
 
@@ -14,7 +14,7 @@ Sentry.init({
       tracing: true
     }),
     // Instrument express middlewares to emit spans
-    new ExpressIntegration({ app })
+    new Integrations.Express({ app })
   ],
   beforeSend(event) {
     if (event.contexts) {

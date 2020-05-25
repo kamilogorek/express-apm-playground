@@ -1,5 +1,5 @@
 const Sentry = require("@sentry/node");
-const { Express: ExpressIntegration } = require("@sentry/integrations");
+const { Integrations } = require("@sentry/apm");
 const express = require("express");
 const http = require("http");
 const https = require("https");
@@ -18,13 +18,14 @@ Sentry.init({
     new Sentry.Integrations.Http({
       tracing: true
     }),
-    new ExpressIntegration({ app })
+    new Integrations.Express({ app })
   ],
   beforeSend(event) {
     if (event.spans) {
-      banner("TRACING EVENT");
+      banner("TRANSACTION");
+      console.log(event.contexts.trace);
       banner("SPANS");
-      console.log(event.spans.map(x => `${x.op} ${x.description}`));
+      console.log(event.spans.map(x => `${x.op} ${x.description} ${JSON.stringify(x.toJSON(), undefined, 2)}`));
     } else {
       banner("EXCEPTION EVENT");
       console.log(
@@ -71,15 +72,16 @@ app.use(function getDataForUser(_, _, next) {
   }, 1);
 });
 
-app.use(function parseUserData(_, _, next) {
+app.use(function parseUserData(_, res, next) {
+  const transaction = res.getTransaction();
   setTimeout(() => {
-    let span = Sentry.startSpan({
+    let span = transaction.startChild({
       op: "encode",
       description: "parseAvatarImages"
     });
     setTimeout(() => {
       span.finish();
-      span = Sentry.startSpan({
+      span = transaction.startChild({
         op: "image",
         description: "generateAllPossibleFormats"
       });
