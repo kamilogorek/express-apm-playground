@@ -1,6 +1,3 @@
-(use `apm` branch of `sentry-javascript` to test it out)
-
-
 ```sh
 $ git clone https://github.com/getsentry/sentry-javascript.git
 $ cd sentry-javascript
