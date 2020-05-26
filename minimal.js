@@ -16,15 +16,16 @@ Sentry.init({
     // Instrument express middlewares to emit spans
     new Integrations.Express({ app })
   ],
-  beforeSend(event) {
-    if (event.contexts) {
-      console.log(event.contexts.trace);
-    }
-    if (event.spans) {
-      console.log(event.spans);
-    }
-    return null;
+});
+
+Sentry.addGlobalEventProcessor(function(event) {
+  if (event.contexts) {
+    console.log(event.contexts.trace);
   }
+  if (event.spans) {
+    console.log(event.spans);
+  }
+  return null;
 });
 
 // This handler still has to be the first one, as it creates a context separated domain

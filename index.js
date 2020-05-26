@@ -20,22 +20,23 @@ Sentry.init({
     }),
     new Integrations.Express({ app })
   ],
-  beforeSend(event) {
-    if (event.spans) {
-      banner("TRANSACTION");
-      console.log(event.contexts.trace);
-      banner("SPANS");
-      console.log(event.spans.map(x => `${x.op} ${x.description} ${JSON.stringify(x.toJSON(), undefined, 2)}`));
-    } else {
-      banner("EXCEPTION EVENT");
-      console.log(
-        `${event.exception.values[0].type}: ${event.exception.values[0].value}`
-      );
-    }
-    banner("BREADCRUMBS");
-    console.log(event.breadcrumbs.map(x => x.category));
-    return null;
+});
+
+Sentry.addGlobalEventProcessor(function(event) {
+  if (event.spans) {
+    banner("TRANSACTION");
+    console.log(event.contexts.trace);
+    banner("SPANS");
+    console.log(event.spans.map(x => `${x.op} ${x.description} ${JSON.stringify(x.toJSON(), undefined, 2)}`));
+  } else {
+    banner("EXCEPTION EVENT");
+    console.log(
+      `${event.exception.values[0].type}: ${event.exception.values[0].value}`
+    );
   }
+  banner("BREADCRUMBS");
+  console.log(event.breadcrumbs.map(x => x.category));
+  return null;
 });
 
 app.use(Sentry.Handlers.requestHandler());
@@ -73,7 +74,7 @@ app.use(function getDataForUser(_, _, next) {
 });
 
 app.use(function parseUserData(_, res, next) {
-  const transaction = res.getTransaction();
+  const transaction = Sentry.getCurrentHub().getScope().getSpan();
   setTimeout(() => {
     let span = transaction.startChild({
       op: "encode",
