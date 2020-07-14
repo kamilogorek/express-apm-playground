@@ -74,7 +74,7 @@ app.use(function getDataForUser(_, _, next) {
 });
 
 app.use(function parseUserData(_, res, next) {
-  const transaction = Sentry.getCurrentHub().getScope().getSpan();
+  const transaction = Sentry.getCurrentHub().getScope().getTransaction();
   setTimeout(() => {
     let span = transaction.startChild({
       op: "encode",
@@ -119,7 +119,15 @@ app.use(function updateComments(_, _, next) {
 });
 
 app.get("/success", function successHandler(req, res) {
-  banner("SUCCESS HANDLER");
+  const transaction = Sentry.getCurrentHub().getScope().getTransaction();
+  if (transaction) {
+    let span = transaction.startChild({
+      op: "encode",
+      description: "parseAvatarImages"
+    });
+    // Do something
+    span.finish();
+  }
   res.status(200).end();
 });
 

@@ -6,8 +6,10 @@ const http = require("http");
 var app = express();
 
 Sentry.init({
-  dsn: "http://dc04f196cc294d32978cfd2c0e51564b@localhost:8000/1",
+  dsn: "https://9e9fd4523d784609a5fc0ebb1080592f@o19635.ingest.sentry.io/50622",
+  // dsn: "http://2ac609ee6fa449f5bc295ea0fa258711@localhost:8000/2",
   tracesSampleRate: 1,
+  debug: true,
   integrations: [
     // Instrument HTTP/s calls to emit spans
     new Sentry.Integrations.Http({
@@ -16,6 +18,10 @@ Sentry.init({
     // Instrument express middlewares to emit spans
     new Integrations.Express({ app })
   ],
+  beforeSend(event) {
+    console.log(event);
+    return event;
+  }
 });
 
 Sentry.addGlobalEventProcessor(function(event) {
@@ -25,7 +31,7 @@ Sentry.addGlobalEventProcessor(function(event) {
   if (event.spans) {
     console.log(event.spans);
   }
-  return null;
+  return event;
 });
 
 // This handler still has to be the first one, as it creates a context separated domain
@@ -45,6 +51,6 @@ app.get("/users", function usersHandler(req, res) {
 });
 app.use(Sentry.Handlers.errorHandler());
 
-app.listen(3000, () => {
-  http.get("http://localhost:3000/users");
+app.listen(3123, () => {
+  http.get("http://localhost:3123/users");
 });
