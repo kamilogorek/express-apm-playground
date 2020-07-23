@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/browser";
-// import { Integrations } from "@sentry/tracing";
-import { Integrations } from "@sentry/apm";
+import { Integrations } from "@sentry/tracing";
+// import { Integrations } from "@sentry/apm";
 
 
 Sentry.init({
@@ -8,8 +8,8 @@ Sentry.init({
     tracesSampleRate: 1,
     debug: true,
     integrations: [
-    //   new Integrations.BrowserTracing()
-      new Integrations.Tracing()
+      new Integrations.BrowserTracing()
+    //   new Integrations.Tracing()
     ],
     beforeSend(event) {
       console.log(event);
