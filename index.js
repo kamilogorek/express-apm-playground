@@ -1,5 +1,5 @@
 const Sentry = require("@sentry/node");
-const { Integrations } = require("@sentry/apm");
+const { Integrations } = require("@sentry/tracing");
 const express = require("express");
 const http = require("http");
 const https = require("https");
